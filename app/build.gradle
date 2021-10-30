@@ -54,10 +54,6 @@ dependencies {
     // Lifecycle
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
 
-    // Epoxy
-    implementation "com.airbnb.android:epoxy:4.5.0"
-    kapt "com.airbnb.android:epoxy-processor:4.5.0"
-
     // Firebase
     implementation platform('com.google.firebase:firebase-bom:28.4.2')
     implementation 'com.google.firebase:firebase-auth-ktx'
