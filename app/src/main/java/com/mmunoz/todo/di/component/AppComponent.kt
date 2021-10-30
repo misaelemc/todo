@@ -2,7 +2,6 @@ package com.mmunoz.todo.di.component
 
 import com.mmunoz.todo.ToDoApp
 import com.mmunoz.todo.di.modules.ActivityBuilder
-import com.mmunoz.todo.di.modules.AppModule
 import com.mmunoz.todo.di.modules.FactoryModule
 import com.mmunoz.todo.ui.activities.MainActivity
 import dagger.BindsInstance
@@ -14,7 +13,6 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules = [
-        AppModule::class,
         FactoryModule::class,
         ActivityBuilder::class,
         AndroidSupportInjectionModule::class

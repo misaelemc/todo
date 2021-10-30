@@ -16,10 +16,6 @@ class DatabaseRepository @Inject constructor() {
         FirebaseAuth.getInstance()
     }
 
-    private val storageReference by lazy {
-        FirebaseStorage.getInstance().reference
-    }
-
     private val dbReference: DatabaseReference by lazy {
         FirebaseDatabase.getInstance().getReference("tasks")
     }

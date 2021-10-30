@@ -30,14 +30,6 @@ class MainActivity : DaggerAppCompatActivity() {
             R.id.MyTaskFragment
         }
         navController.graph = navGraph
-
-//
-//        val navController = findNavController(R.id.nav_host_fragment_content_main)
-//        navController.graph.startDestination = if (currentUser == null) {
-//            R.id.LoginFragment
-//        } else {
-//            R.id.MyTaskFragment
-//        }
     }
 
     override fun androidInjector() = androidInjector

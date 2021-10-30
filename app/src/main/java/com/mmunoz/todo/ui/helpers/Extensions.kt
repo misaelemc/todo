@@ -8,8 +8,6 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 
-const val TASK_ARG = "task"
-
 fun TextView.showError(@StringRes error: Int) {
     showErrorMessage(context.getString(error))
 }

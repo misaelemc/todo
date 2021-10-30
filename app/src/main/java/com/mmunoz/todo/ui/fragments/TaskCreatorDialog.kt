@@ -18,10 +18,6 @@ import com.mmunoz.todo.databinding.DialogTaskCreatorBinding
 import com.mmunoz.todo.ui.helpers.showToastError
 import com.mmunoz.todo.ui.viewModels.TaskViewModel
 import dagger.android.support.AndroidSupportInjection
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import javax.inject.Inject
 
 class TaskCreatorDialog : DialogFragment() {

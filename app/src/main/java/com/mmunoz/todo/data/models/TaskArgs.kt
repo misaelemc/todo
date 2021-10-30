@@ -1,6 +1,5 @@
 package com.mmunoz.todo.data.models
 
-import android.net.Uri
 import java.io.Serializable
 
 data class TaskArgs(
