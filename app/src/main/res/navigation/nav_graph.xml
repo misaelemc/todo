@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoginFragment">
+
+    <fragment
+        android:id="@+id/LoginFragment"
+        android:name="com.mmunoz.todo.ui.fragments.LoginFragment"
+        android:label="login"
+        tools:layout="@layout/fragment_login">
+
+        <action
+            android:id="@+id/action_login_to_fragment"
+            app:destination="@id/RegisterFragment" />
+
+        <action
+            android:id="@+id/action_login_to_my_tasks"
+            app:destination="@id/MyTaskFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/RegisterFragment"
+        android:name="com.mmunoz.todo.ui.fragments.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register">
+
+        <action
+            android:id="@+id/action_register_to_login"
+            app:destination="@id/LoginFragment" />
+
+        <action
+            android:id="@+id/action_register_to_my_tasks"
+            app:destination="@id/MyTaskFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/MyTaskFragment"
+        android:name="com.mmunoz.todo.ui.fragments.MyTasksFragment"
+        android:label="My Tasks"
+        tools:layout="@layout/fragment_my_tasks">
+
+        <action
+            android:id="@+id/action_my_tasks_to_login"
+            app:destination="@id/LoginFragment" />
+
+        <action
+            android:id="@+id/action_my_tasks_to_creator"
+            app:destination="@id/TaskCreatorDialog" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/TaskCreatorDialog"
+        android:name="com.mmunoz.todo.ui.fragments.TaskCreatorDialog"
+        android:label="Creator"
+        tools:layout="@layout/dialog_task_creator">
+        <argument
+            android:name="task"
+            app:nullable="true"
+            app:argType="com.mmunoz.todo.data.models.TaskArgs" />
+    </dialog>
+</navigation>
