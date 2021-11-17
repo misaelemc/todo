@@ -1,7 +1,7 @@
 package com.mmunoz.todo.di.modules
 
 import com.mmunoz.todo.di.scopes.ActivityScope
-import com.mmunoz.todo.ui.activities.MainActivity
+import com.mmunoz.todo.presentation.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

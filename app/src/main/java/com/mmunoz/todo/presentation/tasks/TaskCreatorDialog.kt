@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.fragments
+package com.mmunoz.todo.presentation.tasks
 
 import android.app.Activity
 import android.content.Context
@@ -15,8 +15,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.mmunoz.todo.databinding.DialogTaskCreatorBinding
-import com.mmunoz.todo.ui.helpers.showToastError
-import com.mmunoz.todo.ui.viewModels.TaskViewModel
+import com.mmunoz.todo.domain.models.Response
+import com.mmunoz.todo.utils.showToastError
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -34,6 +34,7 @@ class TaskCreatorDialog : DialogFragment() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.data != null && it.resultCode == Activity.RESULT_OK) {
                 imageUri = it.data?.data
+                viewModel.imageTask.value = imageUri
                 binding.imageView.setImageURI(imageUri)
                 binding.imageView.visibility = View.VISIBLE
                 binding.imageViewIcon.visibility = View.GONE
@@ -41,7 +42,7 @@ class TaskCreatorDialog : DialogFragment() {
             }
         }
 
-    val args: TaskCreatorDialogArgs by navArgs()
+    private val args: TaskCreatorDialogArgs by navArgs()
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -60,29 +61,8 @@ class TaskCreatorDialog : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
-        if (args.task != null) {
-            binding.editTextNameTast.setText(args.task!!.name)
-            binding.editTextDescription.setText(args.task!!.description)
-        }
+        viewModel.setArgs(args.task)
         binding.layoutImage.setOnClickListener { selectImage() }
-        binding.buttonSave.setOnClickListener {
-            binding.layoutLoader.visibility = View.VISIBLE
-            if (args.task == null) {
-                viewModel.addTask(
-                    binding.editTextNameTast.text?.toString().orEmpty(),
-                    binding.editTextDescription.text?.toString().orEmpty(),
-                    imageUri
-                )
-            } else {
-                viewModel.editTask(
-                    args.task!!.key,
-                    binding.editTextNameTast.text?.toString().orEmpty(),
-                    binding.editTextDescription.text?.toString().orEmpty(),
-                    args.task!!.image.orEmpty(),
-                    imageUri
-                )
-            }
-        }
     }
 
     override fun onResume() {
@@ -99,13 +79,22 @@ class TaskCreatorDialog : DialogFragment() {
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(TaskViewModel::class.java)
-        viewModel.liveData.observe(viewLifecycleOwner, { action ->
-            binding.layoutLoader.visibility = View.GONE
-            when (action) {
-                is TaskViewModel.TaskAction.Success -> dismiss()
-                is TaskViewModel.TaskAction.Error -> showToastError(getString(action.message))
-                is TaskViewModel.TaskAction.ErrorMessage -> showToastError(action.message)
+        binding.viewModel = viewModel
+        viewModel.taskState.observe(viewLifecycleOwner, { response ->
+            when (response) {
+                is Response.Error -> {
+                    binding.layoutLoader.visibility = View.GONE
+                    showToastError(response.message)
+                }
+                is Response.Success -> {
+                    binding.layoutLoader.visibility = View.GONE
+                    dismiss()
+                }
+                is Response.Loading -> binding.layoutLoader.visibility = View.VISIBLE
             }
+        })
+        viewModel.taskErrorState.observe(viewLifecycleOwner, { error ->
+            showToastError(getString(error))
         })
     }
 

@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.helpers
+package com.mmunoz.todo.utils
 
 import android.os.Handler
 import android.os.Looper
@@ -22,4 +22,8 @@ fun TextView.showErrorMessage(error: String) {
 
 fun Fragment.showToastError(message: String) {
     Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+}
+
+fun View.show(loading: Boolean) {
+    visibility = if (loading) View.VISIBLE else View.GONE
 }

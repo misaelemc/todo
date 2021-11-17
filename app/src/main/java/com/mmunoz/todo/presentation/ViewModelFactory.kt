@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.viewModels
+package com.mmunoz.todo.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

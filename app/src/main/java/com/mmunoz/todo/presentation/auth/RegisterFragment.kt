@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.fragments
+package com.mmunoz.todo.presentation.auth
 
 import android.content.Context
 import android.os.Bundle
@@ -9,11 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.mmunoz.todo.R
-import com.mmunoz.todo.data.models.AuthAction
 import com.mmunoz.todo.databinding.FragmentRegisterBinding
-import com.mmunoz.todo.ui.helpers.showError
-import com.mmunoz.todo.ui.helpers.showErrorMessage
-import com.mmunoz.todo.ui.viewModels.AuthViewModel
+import com.mmunoz.todo.domain.models.Response
+import com.mmunoz.todo.utils.show
+import com.mmunoz.todo.utils.showErrorMessage
+import com.mmunoz.todo.utils.showToastError
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -44,14 +44,7 @@ class RegisterFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupViewModel()
         binding.toolbar.setNavigationOnClickListener { requireActivity().onBackPressed() }
-        binding.buttonCreate.setOnClickListener {
-            val user = binding.editTextUser.text?.toString().orEmpty()
-            val password = binding.editTextPassword.text?.toString().orEmpty()
-            val cPassword = binding.editTextConfirmPassword.text?.toString().orEmpty()
-            viewModel.register(user, password, cPassword)
-        }
     }
-
 
     override fun onDestroyView() {
         _binding = null
@@ -61,12 +54,22 @@ class RegisterFragment : Fragment() {
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(AuthViewModel::class.java)
-        viewModel.liveData.observe(viewLifecycleOwner, { action ->
-            when (action) {
-                AuthAction.Success -> findNavController().navigate(R.id.action_register_to_my_tasks)
-                is AuthAction.Error -> binding.textViewError.showError(action.message)
-                is AuthAction.ErrorMessage -> binding.textViewError.showErrorMessage(action.message)
+        binding.viewModel = viewModel
+        viewModel.authState.observe(viewLifecycleOwner, { response ->
+            when (response) {
+                is Response.Error -> {
+                    binding.layoutLoader.show(false)
+                    showToastError(response.message)
+                }
+                is Response.Success -> {
+                    binding.layoutLoader.show(false)
+                    findNavController().navigate(R.id.action_register_to_my_tasks)
+                }
+                is Response.Loading -> binding.layoutLoader.show(true)
             }
+        })
+        viewModel.authErrorState.observe(viewLifecycleOwner, { error ->
+            binding.textViewError.showErrorMessage(getString(error))
         })
     }
 }

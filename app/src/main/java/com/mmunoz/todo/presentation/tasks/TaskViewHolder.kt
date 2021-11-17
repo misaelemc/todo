@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.adapters
+package com.mmunoz.todo.presentation.tasks
 
 import android.view.View
 import android.widget.TextView

@@ -3,7 +3,7 @@ package com.mmunoz.todo.di.component
 import com.mmunoz.todo.ToDoApp
 import com.mmunoz.todo.di.modules.ActivityBuilder
 import com.mmunoz.todo.di.modules.FactoryModule
-import com.mmunoz.todo.ui.activities.MainActivity
+import com.mmunoz.todo.presentation.MainActivity
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector

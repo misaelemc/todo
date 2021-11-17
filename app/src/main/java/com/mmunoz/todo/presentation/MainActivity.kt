@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.activities
+package com.mmunoz.todo.presentation
 
 import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment

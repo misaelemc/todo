@@ -1,4 +1,4 @@
-package com.mmunoz.todo.ui.fragments
+package com.mmunoz.todo.presentation.tasks
 
 import android.content.Context
 import android.os.Bundle
@@ -14,12 +14,15 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.FirebaseDatabase
 import com.mmunoz.todo.R
-import com.mmunoz.todo.data.models.TaskArgs
-import com.mmunoz.todo.data.models.TaskModel
+import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.DESCRIPTION_FIELD
+import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.IMAGE_FIELD
+import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.NAME_FIELD
+import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.TASKS_REFERENCE
+import com.mmunoz.todo.domain.models.TaskArgs
+import com.mmunoz.todo.domain.models.TaskModel
 import com.mmunoz.todo.databinding.FragmentMyTasksBinding
-import com.mmunoz.todo.ui.adapters.TaskViewHolder
-import com.mmunoz.todo.ui.helpers.showToastError
-import com.mmunoz.todo.ui.viewModels.TaskViewModel
+import com.mmunoz.todo.domain.models.Response
+import com.mmunoz.todo.utils.showToastError
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -63,10 +66,12 @@ class MyTasksFragment : Fragment() {
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(TaskViewModel::class.java)
-        viewModel.liveData.observe(viewLifecycleOwner, { action ->
-            when (action) {
-                is TaskViewModel.TaskAction.Error -> showToastError(getString(action.message))
-                is TaskViewModel.TaskAction.ErrorMessage -> showToastError(action.message)
+        viewModel.taskErrorState.observe(viewLifecycleOwner, { error ->
+            showToastError(getString(error))
+        })
+        viewModel.taskState.observe(viewLifecycleOwner, { response ->
+            when (response) {
+                is Response.Error -> showToastError(response.message)
                 else -> Unit
             }
         })
@@ -80,14 +85,14 @@ class MyTasksFragment : Fragment() {
 
     private fun fetchData() {
         val query = FirebaseDatabase.getInstance()
-            .getReference("tasks")
+            .getReference(TASKS_REFERENCE)
 
         val options = FirebaseRecyclerOptions.Builder<TaskModel>()
             .setQuery(query) {
                 return@setQuery TaskModel(
-                    it.child("name").value.toString(),
-                    it.child("description").value.toString(),
-                    it.child("image").value.toString()
+                    it.child(NAME_FIELD).value.toString(),
+                    it.child(DESCRIPTION_FIELD).value.toString(),
+                    it.child(IMAGE_FIELD).value.toString()
                 )
             }
             .setLifecycleOwner(viewLifecycleOwner)
@@ -152,7 +157,7 @@ class MyTasksFragment : Fragment() {
         } else {
             position
         }
-        getRef(newPosition).key?.let { viewModel.deleteTask(it, task.image) }
+        getRef(newPosition).key?.let { viewModel.delete(it, task.image) }
     }
 
     private fun navigateToTaskCreator(tasksArgs: TaskArgs? = null) {

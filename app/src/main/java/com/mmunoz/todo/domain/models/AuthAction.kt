@@ -1,4 +1,4 @@
-package com.mmunoz.todo.data.models
+package com.mmunoz.todo.domain.models
 
 import androidx.annotation.StringRes
 
