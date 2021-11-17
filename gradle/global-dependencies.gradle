@@ -1,0 +1,48 @@
+ext {
+    // Project
+    minSdkVersion = 24
+    compileSdkVersion = 30
+    targetSdkVersion = 30
+
+    // Gradle
+    gradleVersion = '7.0.2'
+    kotlinGradleVersion = '1.5.30'
+
+    // Google
+    firebaseBomVersion = '28.4.2'
+    firebaseUiDatabaseVersion = '3.1.3'
+    googleServicesVersion = '4.3.10'
+
+    // Dagger
+    daggerVersion = '2.35'
+    daggerAndroidVersion = '2.35'
+
+    // Support Libraries
+    ktxVersion = '1.5.0'
+    ktxCoreVersion = '1.6.0'
+    materialVersion = '1.4.0'
+    appCompatVersion = '1.3.1'
+    constraintLayoutVersion = "2.1.1"
+    coroutinesPlayServicesVersion = "1.4.1"
+
+    //Epoxy
+    epoxyVersion = "4.5.0"
+
+    // Lifecycle
+    lifecycleVersion = '2.3.1'
+
+    // Navigation
+    navigationVersion = '2.3.5'
+
+    // Image handling
+    glideVersion = "4.11.0"
+
+    // Tests
+    testVersion = "1.0.2"
+    testCoreVersion = "1.4.0"
+    jUnitVersion = "4.12"
+    mockitoVersion = "3.5.11"
+    testArchCoreVersion = "2.0.0"
+    espressoVersion = "3.0.2"
+
+}

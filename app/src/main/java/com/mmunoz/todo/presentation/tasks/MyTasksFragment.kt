@@ -5,28 +5,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.database.FirebaseDatabase
-import com.mmunoz.todo.R
 import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.DESCRIPTION_FIELD
-import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.IMAGE_FIELD
+import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.IMAGES_FIELD
 import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.NAME_FIELD
 import com.mmunoz.todo.data.repositories.TaskRepositoryImpl.Companion.TASKS_REFERENCE
-import com.mmunoz.todo.domain.models.TaskArgs
-import com.mmunoz.todo.domain.models.TaskModel
 import com.mmunoz.todo.databinding.FragmentMyTasksBinding
 import com.mmunoz.todo.domain.models.Response
+import com.mmunoz.todo.domain.models.TaskArgs
+import com.mmunoz.todo.domain.models.TaskModel
+import com.mmunoz.todo.presentation.tasks.adapters.MyTaskAdapter
 import com.mmunoz.todo.utils.showToastError
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
-class MyTasksFragment : Fragment() {
+class MyTasksFragment : Fragment(), MyTaskAdapter.Listener {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -34,6 +32,8 @@ class MyTasksFragment : Fragment() {
 
     private var _binding: FragmentMyTasksBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var adapter: MyTaskAdapter
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -63,16 +63,20 @@ class MyTasksFragment : Fragment() {
         super.onDestroyView()
     }
 
+    override fun delete(key: String, images: List<String>) {
+        viewModel.delete(key, images)
+    }
+
+    override fun navigateToTaskCreator(args: TaskArgs?) {
+        findNavController().navigate(MyTasksFragmentDirections.actionMyTasksToCreator(args))
+    }
+
     private fun setupViewModel() {
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(TaskViewModel::class.java)
-        viewModel.taskErrorState.observe(viewLifecycleOwner, { error ->
-            showToastError(getString(error))
-        })
         viewModel.taskState.observe(viewLifecycleOwner, { response ->
-            when (response) {
-                is Response.Error -> showToastError(response.message)
-                else -> Unit
+            if (response is Response.Error) {
+                showToastError(response.message)
             }
         })
     }
@@ -83,6 +87,7 @@ class MyTasksFragment : Fragment() {
         fetchData()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun fetchData() {
         val query = FirebaseDatabase.getInstance()
             .getReference(TASKS_REFERENCE)
@@ -91,76 +96,13 @@ class MyTasksFragment : Fragment() {
             .setQuery(query) {
                 return@setQuery TaskModel(
                     it.child(NAME_FIELD).value.toString(),
-                    it.child(DESCRIPTION_FIELD).value.toString(),
-                    it.child(IMAGE_FIELD).value.toString()
+                    it.child(IMAGES_FIELD).value as? List<String>,
+                    it.child(DESCRIPTION_FIELD).value.toString()
                 )
             }
             .setLifecycleOwner(viewLifecycleOwner)
             .build()
-        setupAdapter(options)
-    }
-
-    private fun setupAdapter(options: FirebaseRecyclerOptions<TaskModel>) {
-        binding.recyclerView.adapter =
-            object : FirebaseRecyclerAdapter<TaskModel, TaskViewHolder>(options) {
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-                    val view: View = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.item_task_view, parent, false)
-                    return TaskViewHolder(view)
-                }
-
-                override fun onBindViewHolder(
-                    holder: TaskViewHolder,
-                    position: Int,
-                    task: TaskModel
-                ) {
-                    holder.textViewName.text = task.name
-                    holder.imageButtonAction.setOnClickListener {
-                        val popupMenu = PopupMenu(requireContext(), it)
-                        popupMenu.menuInflater.inflate(R.menu.menu_main, popupMenu.menu)
-                        popupMenu.setOnMenuItemClickListener { item ->
-                            when (item.itemId) {
-                                R.id.action_edit -> editTask(position, task)
-                                R.id.action_delete -> deleteTask(position, task, options)
-                            }
-                            return@setOnMenuItemClickListener true
-                        }
-                        popupMenu.show()
-                    }
-                }
-            }
-    }
-
-    private fun FirebaseRecyclerAdapter<TaskModel, TaskViewHolder>.editTask(
-        position: Int,
-        task: TaskModel
-    ) {
-        getRef(position).key?.let { key ->
-            navigateToTaskCreator(
-                TaskArgs(
-                    key,
-                    task.name,
-                    task.description,
-                    task.image
-                )
-            )
-        }
-    }
-
-    private fun FirebaseRecyclerAdapter<TaskModel, TaskViewHolder>.deleteTask(
-        position: Int,
-        task: TaskModel,
-        options: FirebaseRecyclerOptions<TaskModel>
-    ) {
-        val newPosition = if (position >= options.snapshots.size) {
-            position - 1
-        } else {
-            position
-        }
-        getRef(newPosition).key?.let { viewModel.delete(it, task.image) }
-    }
-
-    private fun navigateToTaskCreator(tasksArgs: TaskArgs? = null) {
-        findNavController().navigate(MyTasksFragmentDirections.actionMyTasksToCreator(tasksArgs))
+        adapter = MyTaskAdapter(requireContext(), this, options)
+        binding.recyclerView.adapter = adapter
     }
 }

@@ -60,18 +60,26 @@ class LoginFragment : Fragment() {
         viewModel.authState.observe(viewLifecycleOwner, { response ->
             when (response) {
                 is Response.Error -> {
-                    binding.layoutLoader.show(false)
+                    hideLoader()
                     showToastError(response.message)
                 }
                 is Response.Success -> {
-                    binding.layoutLoader.show(false)
+                    hideLoader()
                     findNavController().navigate(R.id.action_login_to_my_tasks)
                 }
-                is Response.Loading -> binding.layoutLoader.show(true)
+                is Response.Loading -> {
+                    binding.buttonLogin.isEnabled = false
+                    binding.layoutLoader.show(true)
+                }
             }
         })
         viewModel.authErrorState.observe(viewLifecycleOwner, { error ->
             binding.textViewError.showErrorMessage(getString(error))
         })
+    }
+
+    private fun hideLoader() {
+        binding.buttonLogin.isEnabled = true
+        binding.layoutLoader.show(false)
     }
 }
