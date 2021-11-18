@@ -29,8 +29,8 @@ class TaskViewModel constructor(
     val imageTask: MutableStateFlow<MutableList<Uri>> = MutableStateFlow(arrayListOf())
     val descriptionTask: MutableStateFlow<String> = MutableStateFlow("")
 
-    private val _taskState = MutableLiveData<Response<Void>>()
-    val taskState: LiveData<Response<Void>> = _taskState
+    private val _taskState = MutableLiveData<Response<Unit>>()
+    val taskState: LiveData<Response<Unit>> = _taskState
 
     private val _taskErrorState = MutableLiveData<Int>()
     val taskErrorState: LiveData<Int> = _taskErrorState

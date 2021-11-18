@@ -24,12 +24,12 @@ class TaskRepositoryImpl @Inject constructor(
     override suspend fun delete(
         key: String,
         currentImages: List<String>
-    ): Flow<Response<Void>> = flow {
+    ): Flow<Response<Unit>> = flow {
         try {
             emit(Response.Loading)
             firebasePhotosManager.clearPhotosByKey(currentImages)
-            val response = dbReference.child(key).removeValue().await()
-            emit(Response.Success(response))
+            dbReference.child(key).removeValue().await()
+            emit(Response.Success(Unit))
         } catch (e: Exception) {
             emit(Response.Error(e.message.orEmpty()))
         }
@@ -40,13 +40,13 @@ class TaskRepositoryImpl @Inject constructor(
         description: String,
         images: List<Uri>,
         location: Location?
-    ): Flow<Response<Void>> = flow {
+    ): Flow<Response<Unit>> = flow {
         try {
             emit(Response.Loading)
             val urlPhotos = firebasePhotosManager.uploadPhotos(images)
             val data = TaskItem(name, description, urlPhotos, location?.latitude, location?.longitude)
-            val response = dbReference.push().setValue(data).await()
-            emit(Response.Success(response))
+            dbReference.push().setValue(data).await()
+            emit(Response.Success(Unit))
         } catch (e: Exception) {
             emit(Response.Error(e.message.orEmpty()))
         }
@@ -58,7 +58,7 @@ class TaskRepositoryImpl @Inject constructor(
         description: String,
         images: List<Uri>,
         currentImages: List<String>
-    ): Flow<Response<Void>> = flow {
+    ): Flow<Response<Unit>> = flow {
         try {
             emit(Response.Loading)
             val urlPhotos = firebasePhotosManager.uploadPhotos(images)
@@ -71,8 +71,8 @@ class TaskRepositoryImpl @Inject constructor(
                 put(IMAGES_FIELD, allImages)
                 put(DESCRIPTION_FIELD, description)
             }
-            val response = dbReference.child(key).updateChildren(task).await()
-            emit(Response.Success(response))
+            dbReference.child(key).updateChildren(task).await()
+            emit(Response.Success(Unit))
         } catch (e: Exception) {
             emit(Response.Error(e.message.orEmpty()))
         }

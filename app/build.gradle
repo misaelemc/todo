@@ -80,6 +80,7 @@ dependencies {
     testImplementation "junit:junit:$rootProject.ext.jUnitVersion"
     testImplementation "org.mockito:mockito-core:$rootProject.ext.mockitoVersion"
     testImplementation "org.mockito:mockito-inline:$rootProject.ext.mockitoVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2"
     testImplementation "androidx.arch.core:core-testing:$rootProject.ext.testArchCoreVersion"
     androidTestImplementation "com.android.support.test:runner:$rootProject.ext.testVersion"
     androidTestImplementation "com.android.support.test:rules:$rootProject.ext.testVersion"
